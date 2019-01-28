@@ -50,7 +50,7 @@
             android:src="@drawable/selector_btn_audio_pre"/>
 
         <ImageView
-            android:id="@+id/state"
+            android:id="@+id/state_play"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"

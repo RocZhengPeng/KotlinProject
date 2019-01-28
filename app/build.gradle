@@ -59,4 +59,5 @@ dependencies {
     implementation 'com.dou361.ijkplayer:jjdxm-ijkplayer:1.0.2'
     //jiecaovideoplayer
     compile 'fm.jiecao:jiecaovideoplayer:5.8.1'
+    compile 'org.greenrobot:eventbus:3.0.0'
 }
