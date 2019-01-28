@@ -20,7 +20,7 @@ import java.util.*
 class AudioService : Service() {
     var mediaPlayer: MediaPlayer? = null
     var list: ArrayList<AudioBean>? = null
-    var position: Int = 0
+    var position: Int = -2
     val binder by lazy {
         AudioBinder()
     }
@@ -45,11 +45,18 @@ class AudioService : Service() {
 
     //多次启动执行多次
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        //获取集合以及当前的position
-        list = intent?.getParcelableArrayListExtra<AudioBean>("list")
-        position = intent?.getIntExtra("position", -1) ?: -1
-        //开始播放音乐
-        binder.playItem()
+        var pos = intent?.getIntExtra("position", -1) ?: -1
+        if (pos != position) {//想要播放的条目和正在播放的条目不是同一首
+            position = pos
+            //获取集合以及当前的position
+            list = intent?.getParcelableArrayListExtra<AudioBean>("list")
+            //开始播放音乐
+            binder.playItem()
+        } else {
+            //主动通知界面更新
+            binder.notifyUpdateUi()
+
+        }
         //START_STICKY 粘性的  service强制杀死后，会尝试重新启动service，不会传递原来的Intent
         //START_NOT_STICKY 非粘性  service强制杀死后，不会尝试重新启动service
         //START_REDELIVER_INTENT ervice强制杀死后，会尝试重新启动service，会传递原来的Intent
@@ -89,15 +96,10 @@ class AudioService : Service() {
                 //获取要播放音乐的position
                 when (mode) {
                     MODE_RANDOM -> position = Random().nextInt(it.size - 1)
-                    else -> {
-                        if (position == 0) {
-                            position = it.size - 1
-                        } else {
-                            position--
-                        }
-                    }
+                    else -> position = (position + 1) % it.size
                 }
             }
+            playItem()
         }
 
         /**
@@ -194,11 +196,17 @@ class AudioService : Service() {
         /**
          * 通知界面更新
          */
-        private fun notifyUpdateUi() {
+         fun notifyUpdateUi() {
             EventBus.getDefault().post(list?.get(position))
         }
 
         fun playItem() {
+            //如果mediaPlayer已经存在就先释放掉
+            if (mediaPlayer != null) {
+                mediaPlayer?.reset()
+                mediaPlayer?.release()
+                mediaPlayer = null
+            }
             mediaPlayer = MediaPlayer()
             mediaPlayer?.let {
                 //播放音乐

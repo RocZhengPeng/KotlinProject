@@ -17,6 +17,7 @@ import com.example.administrator.roczhengplayer.model.AudioBean
 import com.example.administrator.roczhengplayer.service.AudioService
 import com.example.administrator.roczhengplayer.service.Iservice
 import com.example.administrator.roczhengplayer.util.StringUtil
+import com.example.administrator.roczhengplayer.widget.PlayListPopWindow
 import kotlinx.android.synthetic.main.activity_music_player_bottom.*
 import kotlinx.android.synthetic.main.activity_music_player_middle.*
 import kotlinx.android.synthetic.main.activity_music_player_top.*
@@ -78,7 +79,18 @@ class AudioPlayerActivity : BaseActivity(), View.OnClickListener, SeekBar.OnSeek
             R.id.mode -> updatePlayMode()
             R.id.pre -> iService?.playPre()
             R.id.next -> iService?.playNext()
+            R.id.playlist -> showPlayList()
         }
+    }
+
+    /**
+     * 显示播放列表
+     */
+    private fun showPlayList() {
+        //获取底部高度
+        val bottomH = audio_player_bottom.height
+        val popWindow = PlayListPopWindow(this)
+        popWindow.showAsDropDown(audio_player_bottom, 0, bottomH)
     }
 
     /**
@@ -208,6 +220,8 @@ class AudioPlayerActivity : BaseActivity(), View.OnClickListener, SeekBar.OnSeek
         //上一曲和下一曲
         pre.setOnClickListener(this)
         next.setOnClickListener(this)
+        //播放列表
+        playlist.setOnClickListener(this)
     }
 
     override fun getLayoutId(): Int {
@@ -232,10 +246,10 @@ class AudioPlayerActivity : BaseActivity(), View.OnClickListener, SeekBar.OnSeek
         //通过Intent将list以及position传递过去
         /*  intent.putExtra("list", list)
           intent.putExtra("position", position)*/
-        //先开启服务
-        startService(intent)
-        //再绑定服务,BIND_AUTO_CREATE绑定的时候服务吗，没有创建就给它创建出来
+        //先绑定服务,BIND_AUTO_CREATE绑定的时候服务吗，没有创建就给它创建出来
         bindService(intent, conn, Context.BIND_AUTO_CREATE)
+        //再开启服务
+        startService(intent)
 
         /*   //播放音乐
            val mediaPlayer= MediaPlayer()
