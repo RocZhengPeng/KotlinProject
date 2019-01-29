@@ -1,5 +1,7 @@
 package com.example.administrator.roczhengplayer.service
 
+import com.example.administrator.roczhengplayer.model.AudioBean
+
 /**
  * author : roczheng
  * e-mail : 306608923@qq.com
@@ -17,4 +19,6 @@ interface Iservice {
     fun getPlayMode(): Int
     fun playPre()
     fun playNext()
+    fun getPlayList(): List<AudioBean>?
+    fun playPosition(position: Int)
 }

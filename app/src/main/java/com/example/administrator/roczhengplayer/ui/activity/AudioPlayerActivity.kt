@@ -10,8 +10,10 @@ import android.os.Handler
 import android.os.IBinder
 import android.os.Message
 import android.view.View
+import android.widget.AdapterView
 import android.widget.SeekBar
 import com.example.administrator.roczhengplayer.R
+import com.example.administrator.roczhengplayer.adapter.PopAdapter
 import com.example.administrator.roczhengplayer.base.BaseActivity
 import com.example.administrator.roczhengplayer.model.AudioBean
 import com.example.administrator.roczhengplayer.service.AudioService
@@ -28,7 +30,14 @@ import org.greenrobot.eventbus.ThreadMode
 /**
  * Created by Administrator on 2019/1/23.
  */
-class AudioPlayerActivity : BaseActivity(), View.OnClickListener, SeekBar.OnSeekBarChangeListener {
+class AudioPlayerActivity : BaseActivity(), View.OnClickListener, SeekBar.OnSeekBarChangeListener, AdapterView.OnItemClickListener {
+    /**
+     * 弹出的播放列表ListViewitem点击事件
+     */
+    override fun onItemClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+        //播放当前歌曲
+        iService?.playPosition(position)
+    }
 
     /**
      * 进度改变的回调
@@ -87,10 +96,15 @@ class AudioPlayerActivity : BaseActivity(), View.OnClickListener, SeekBar.OnSeek
      * 显示播放列表
      */
     private fun showPlayList() {
-        //获取底部高度
-        val bottomH = audio_player_bottom.height
-        val popWindow = PlayListPopWindow(this)
-        popWindow.showAsDropDown(audio_player_bottom, 0, bottomH)
+        val list = iService?.getPlayList()
+        list?.let {
+            //创建adapter
+            val adpater = PopAdapter(it)
+            //获取底部高度
+            val bottomH = audio_player_bottom.height
+            val popWindow = PlayListPopWindow(this, adpater, this, window)
+            popWindow.showAsDropDown(audio_player_bottom, 0, bottomH)
+        }
     }
 
     /**
