@@ -2,10 +2,8 @@ package com.example.administrator.roczhengplayer.ui.activity
 
 import android.content.ComponentName
 import android.content.Context
-import android.content.Intent
 import android.content.ServiceConnection
 import android.graphics.drawable.AnimationDrawable
-import android.media.MediaPlayer
 import android.os.Handler
 import android.os.IBinder
 import android.os.Message
@@ -59,14 +57,14 @@ class AudioPlayerActivity : BaseActivity(), View.OnClickListener, SeekBar.OnSeek
      * 手指触摸seekbar回调
      */
     override fun onStartTrackingTouch(seekBar: SeekBar?) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+
     }
 
     /**
      * 手指离开回调
      */
     override fun onStopTrackingTouch(seekBar: SeekBar?) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+
     }
 
     var audioBean: AudioBean? = null
@@ -83,7 +81,7 @@ class AudioPlayerActivity : BaseActivity(), View.OnClickListener, SeekBar.OnSeek
 
     override fun onClick(v: View?) {
         when (v?.id) {
-            R.id.start -> updatePlayState()
+            R.id.state_play -> updatePlayState()
             R.id.back -> finish()
             R.id.mode -> updatePlayMode()
             R.id.pre -> iService?.playPre()
@@ -135,6 +133,8 @@ class AudioPlayerActivity : BaseActivity(), View.OnClickListener, SeekBar.OnSeek
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun onEventMainThread(itemBean: AudioBean) {
+        //设置播放歌曲名称
+        lyricView.setSongName(itemBean.display_name)
         //记录下播放的歌曲
         this.audioBean = itemBean
         //歌曲名称
@@ -149,6 +149,9 @@ class AudioPlayerActivity : BaseActivity(), View.OnClickListener, SeekBar.OnSeek
 
         //获取总进度
         duration = iService?.getDuration() ?: 0
+        //设置歌词播放总进度
+        lyricView.setSongDuration(duration)
+
         //进度条设置进度最大值
         progress_sk.max = duration
         //更新播放进度
@@ -168,7 +171,7 @@ class AudioPlayerActivity : BaseActivity(), View.OnClickListener, SeekBar.OnSeek
         //更新进度数据
         updateProgress(progress)
         //定时获取进度
-        handler.sendEmptyMessageDelayed(MSG_PROGRESS, 1000)
+        handler.sendEmptyMessage(MSG_PROGRESS)
 
     }
 
@@ -180,6 +183,8 @@ class AudioPlayerActivity : BaseActivity(), View.OnClickListener, SeekBar.OnSeek
         progress.text = (StringUtil.parseDuration(pro) + "/" + StringUtil.parseDuration(duration))
         //更新进度条
         progress_sk.setProgress(pro)
+        //更新歌词进度
+        lyricView.updateProgress(pro)
     }
 
     /**
@@ -236,6 +241,13 @@ class AudioPlayerActivity : BaseActivity(), View.OnClickListener, SeekBar.OnSeek
         next.setOnClickListener(this)
         //播放列表
         playlist.setOnClickListener(this)
+        //歌词拖动进度更新监听
+        lyricView.setProgressListener {
+            //更新播放进度
+            iService?.seekTo(it)
+            //更新进度显示
+            updateProgress(it)
+        }
     }
 
     override fun getLayoutId(): Int {

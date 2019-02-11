@@ -68,7 +68,6 @@ class JiecaoVideoPlayerActivity : BaseActivity() {
              * 滑动回调
              */
             override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
             }
 
             /**
@@ -86,7 +85,6 @@ class JiecaoVideoPlayerActivity : BaseActivity() {
              * 滑动状态改变的回调
              */
             override fun onPageScrollStateChanged(state: Int) {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
             }
 
         })
